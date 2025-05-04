@@ -1,135 +1,163 @@
 # Settlement Ramp
 
-**Automated On-Chain Settlement Triggered by Verified Fiat Payments on Base**
+**Automated On-Chain Settlement on Base Sepolia Triggered by Verified Off-Chain
+Payments**
 
 `<place-settlement-ramp-logo-here>`
 
-## Core Focus: Automated On-Chain Reaction
+## Core Focus: Automated On-Chain Reaction (Base Sepolia MVP)
 
 Settlement Ramp is laser-focused on demonstrating the **automated triggering of
-on-chain actions on Base** based on verified off-chain fiat payment
-confirmations. We achieve this through a robust, multi-layered oracle
-architecture:
+on-chain actions on Base Sepolia** based on verified off-chain payment
+confirmations, simulating a relevant LATAM use case (**PayPal -> Virtual US
+Account**). We achieve this through a robust, multi-layered oracle architecture:
 
-1. **ChainSettle (Akash):** Verifies the real-world payment event using external
-   APIs (e.g., Plaid) and generates a cryptographic proof.
+1. **ChainSettle (Akash):** **Simulates** receiving confirmation of the target
+   payment event and generates a cryptographic proof. Hosted on Akash.
 2. **Chainlink Functions:** Cryptographically verifies the ChainSettle
-   attestation proof off-chain in a decentralized manner.
-3. **Settlement Ramp Contract (Base):** Receives the verified attestation
-   on-chain from the trusted Chainlink oracle and emits a crucial event
-   (`PaymentAttested`).
-4. **Chainlink Automation:** Listens for the `PaymentAttested` event and
-   automatically triggers a subsequent, predefined on-chain function call
-   (`handleAttestationEvent`).
+   attestation proof off-chain via its decentralized network.
+3. **Settlement Ramp Contract (Base Sepolia):** Receives the verified
+   attestation on-chain from the trusted Chainlink oracle and emits
+   `PaymentAttested`.
+4. **Chainlink Automation:** Listens for `PaymentAttested` on Base Sepolia and
+   automatically triggers `handleAttestationEvent`.
+5. **Minimal UI & Middleware:** A basic UI initiates the flow via a simple
+   middleware, providing visual confirmation of the E2E automation.
 
-This integrated system provides a trust-minimized pathway for merchants to
-automate complex treasury operations and business logic directly on the Base
-blockchain, reacting instantly and reliably to real-world payment settlements.
+This integrated system provides a trust-minimized pathway for automating
+on-chain logic based on verified external events, demonstrated end-to-end on
+Base Sepolia.
 
-## Technical Architecture: A Multi-Layered Bridge
+## Technical Architecture: A Multi-Layered Bridge (Base Sepolia MVP)
 
-Our architecture combines specialized, decentralized components for maximum
-security and reliability:
+Our architecture combines specialized, decentralized components for security and
+reliability:
 
-1. **ChainSettle Node (Akash)**:
-   - Handles direct API integrations (e.g., Plaid) to detect and validate fiat
-     payment events.
-   - Generates cryptographically signed attestations as proof of verification
-     using its private key.
+1. **ChainSettle Node (Akash - Simulation)**:
+   - **Simulates** receiving confirmation data representing USD arriving in a
+     virtual US account (contextually, like one provided by Lulubit), with the
+     original source being PayPal. _(Simulation is necessary due to current
+     LATAM API limitations preventing direct integration within the MVP scope.)_
+   - Generates cryptographically signed attestations using its private key.
    - Exposed securely via an API endpoint hosted on the decentralized Akash
      Network.
 2. **Chainlink Functions (Attestation Verification)**:
    - Acts as a secure, decentralized off-chain computation layer.
-   - Retrieves signed attestation data from the ChainSettle API endpoint.
+   - Retrieves the signed attestation data from the ChainSettle API endpoint.
    - Independently verifies the cryptographic signature using ChainSettle's
      known public key.
-   - If valid, calls the `Settlement Ramp` contract on Base, passing the
+   - If valid, calls the `Settlement Ramp` contract on Base Sepolia, passing the
      verified attestation data.
-3. **Settlement Ramp Contract (Base)**:
-   - A minimal, focused smart contract deployed on Base.
+3. **Settlement Ramp Contract (Base Sepolia)**:
+   - A minimal, focused smart contract deployed on Base Sepolia.
    - Receives calls strictly from the authorized Chainlink Functions oracle
      address.
-   - Upon receiving verified data via `attestPayment`, records necessary details
-     and emits a `PaymentAttested` event.
-   - Includes a target function (`handleAttestationEvent`) designed to be
-     triggered _only_ by Chainlink Automation.
+   - Upon receiving verified data via `attestPayment`, emits `PaymentAttested`.
+   - Includes `handleAttestationEvent` triggered _only_ by Chainlink Automation.
 4. **Chainlink Automation (Event Listener & Trigger)**:
-   - An Upkeep registered on the Chainlink Automation network for Base.
-   - Monitors the `PaymentAttested` event emitted by the `Settlement Ramp`
-     contract.
-   - When the event is detected, it automatically triggers the registered
-     `handleAttestationEvent` function on the `Settlement Ramp` contract,
-     ensuring automated follow-through.
+   - An Upkeep registered on the Chainlink Automation network for Base Sepolia.
+   - Monitors the `PaymentAttested` event.
+   - Automatically triggers `handleAttestationEvent` upon detection.
+5. **Minimal UI (React/Tailwind/Vite) & Middleware (Python/Flask)**:
+   - UI provides a button to trigger the flow.
+   - Middleware receives the UI trigger, calls the ChainSettle Akash API, and
+     returns.
+   - UI listens for the final `AttestationHandled` event on Base Sepolia for
+     status updates.
 
 ```mermaid
 sequenceDiagram
-    participant Plaid as Plaid API
-    participant ChainSettle as ChainSettle Node (Akash)
+    participant UI as Minimal UI (React)
+    participant Middleware as Minimal Middleware (Flask)
+    participant ChainSettle as ChainSettle Node (Akash - Simulation)
     participant CL_Functions as Chainlink Functions
-    participant Base_Contract as Settlement Ramp Contract (Base)
+    participant Base_Contract as Settlement Ramp Contract (Base Sepolia)
     participant CL_Automation as Chainlink Automation
 
-    Note over Plaid,Base_Contract: Off-Chain Detection & Verification
-    Plaid->>ChainSettle: Payment notification detected
-    ChainSettle->>ChainSettle: Validate payment, Generate signed proof
+    Note over UI, Base_Contract: E2E Automated Flow (Base Sepolia MVP)
+    UI->>Middleware: Trigger Simulate Payment
+    Middleware->>ChainSettle: Request Attestation for Simulated Event
+    ChainSettle->>ChainSettle: Generate signed proof
+    ChainSettle-->>Middleware: Ack (Proof generated)
+    Middleware-->>UI: Ack (Request sent)
 
-    Note over ChainSettle,Base_Contract: Secure Oracle Bridge
+    Note over ChainSettle, Base_Contract: Secure Oracle Bridge
     CL_Functions->>ChainSettle: Request signed attestation (via API)
     ChainSettle->>CL_Functions: Return signed payload
     CL_Functions->>CL_Functions: Verify cryptographic signature
     CL_Functions->>Base_Contract: Call attestPayment(verified_data)
 
-    Note over Base_Contract,CL_Automation: On-Chain Trigger & Automation
-    Base_Contract->>Base_Contract: Record Attestation (Internal State)
-    Base_Contract->>CL_Automation: Emit PaymentAttested Event
-    CL_Automation->>Base_Contract: Trigger handleAttestationEvent()
-    Base_Contract->>Base_Contract: Execute automated logic (e.g., emit AttestationHandled)
+    Note over Base_Contract, CL_Automation: On-Chain Trigger & Automation
+    Base_Contract->>Base_Contract: Emit PaymentAttested Event
+    CL_Automation->>Base_Contract: Detect Event & Trigger handleAttestationEvent()
+    Base_Contract->>Base_Contract: Emit AttestationHandled Event
+
+    Note over Base_Contract, UI: Final Confirmation
+    Base_Contract-->>UI: AttestationHandled Event Detected
+    UI->>UI: Update Status Display
 ```
 
 ## Security Model: Defense in Depth
 
-Our layered architecture provides robust security guarantees:
+Our layered architecture provides robust security guarantees for the bridging
+mechanism:
 
-1. **Off-Chain Verification Integrity (ChainSettle on Akash):** Ensures the
-   initial real-world payment event detection and attestation signing occur
-   within the controlled environment of the ChainSettle node, managing API keys
-   securely.
-2. **Cryptographic Proof Verification (Chainlink Functions):** Adds a critical
-   decentralized verification layer. The attestation's authenticity (via
-   signature) is independently confirmed by the Chainlink DON _before_ any state
-   change occurs on Base.
-3. **On-Chain Authorization (Settlement Ramp Contract):** The contract strictly
-   enforces that only the authorized Chainlink Functions oracle address can
-   submit attestations via the `attestPayment` function.
-4. **Automated Reaction Security (Chainlink Automation):** Ensures that the
-   follow-up action (`handleAttestationEvent`) is triggered reliably and
-   decentrally _only_ upon the verified `PaymentAttested` event, preventing
-   manipulation or reliance on centralized triggers for downstream processes.
-
-This combination minimizes trust assumptions and creates a highly reliable
-bridge between off-chain events and automated on-chain actions.
+1. **Attestation Integrity (ChainSettle on Akash):** Ensures generation and
+   signing occur within the controlled ChainSettle node environment. The
+   cryptographic proof is real.
+2. **Cryptographic Proof Verification (Chainlink Functions):** Decentralized
+   verification of the attestation's authenticity _before_ hitting the
+   blockchain.
+3. **On-Chain Authorization (Settlement Ramp Contract):** Contract enforces that
+   only the authorized Chainlink Functions oracle can call `attestPayment`.
+4. **Automated Reaction Security (Chainlink Automation):** Ensures the follow-up
+   action (`handleAttestationEvent`) is triggered reliably and decentrally
+   _only_ upon the verified `PaymentAttested` event.
 
 ## Implementation Highlights (MVP)
 
-### 1. ChainSettle API Endpoint (Akash)
+### 1. ChainSettle Simulation Trigger (Akash)
 
-A secure, authenticated endpoint (e.g., `/api/v1/attestations/<escrow_id>`) on
-the Akash-hosted ChainSettle node, returning JSON containing the payment details
-and the cryptographic signature (proof).
+- A specific API endpoint or modified CLI command on the Akash node simulates
+  the "PayPal -> Virtual Account" confirmation and generates the signed JSON
+  proof upon request.
 
 ### 2. Chainlink Functions Script
 
-JavaScript code executed by the Chainlink DON:
+- JavaScript using **viem** to call the ChainSettle Akash API, perform
+  `verifyMessage`, and encode the call to `attestPayment`.
 
-- Fetches the signed attestation JSON from the ChainSettle API.
-- Uses `ethers.js` (available in the Functions runtime) to perform
-  `verifyMessage` using the known ChainSettle public key.
-- Throws an error if verification fails.
-- If successful, encodes the verified payload (e.g., as a JSON string or
-  structured bytes) and returns it for the Chainlink node to use in the
-  `attestPayment` call.
+```javascript
+// Conceptual Chainlink Functions Script Snippet
+import { createPublicClient, hashMessage, http, recoverAddress } from "viem";
+// ... (setup Functions, secrets for API_URL, AUTH_TOKEN, PUBLIC_KEY)
 
-### 3. Settlement Ramp Contract (Base)
+// Fetch from ChainSettle API
+const response = await Functions.makeHttpRequest({
+  /* ... call Akash API ... */
+});
+const signedPayload = response.data; // Assuming JSON { data: {...}, signature: "0x..." }
+
+// Verify Signature
+const expectedSigner = secrets.CHAINSETTLE_PUBLIC_KEY;
+const messageHash = hashMessage(
+  JSON.stringify(signedPayload.data),
+); // Or precise hashing used by ChainSettle
+const recoveredAddress = recoverAddress({
+  hash: messageHash,
+  signature: signedPayload.signature,
+});
+
+if (recoveredAddress.toLowerCase() !== expectedSigner.toLowerCase()) {
+  throw new Error("Invalid Signature");
+}
+
+// Encode call data for SettlementRamp.attestPayment(string)
+const attestationJson = JSON.stringify(signedPayload.data); // Pass verified data
+return Functions.encodeString(attestationJson);
+```
+
+### 3. Settlement Ramp Contract (Base Sepolia)
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -137,24 +165,11 @@ pragma solidity ^0.8.19;
 
 contract SettlementRamp {
     address public immutable chainlinkFunctionsOracle;
-    address public immutable chainlinkAutomationRegistry; // Automation Registry address
+    address public immutable chainlinkAutomationRegistry;
 
-    // Event emitted when a fiat payment is attested on-chain by the oracle
-    event PaymentAttested(
-        bytes32 indexed escrowId,
-        address indexed merchant, // Simulated/derived merchant address
-        uint256 amount, // Amount (in base units or similar)
-        uint256 timestamp,
-        string transactionId // Identifier from the off-chain system
-    );
+    event PaymentAttested(bytes32 indexed escrowId, address indexed merchant, uint256 amount, uint256 timestamp, string txRef);
+    event AttestationHandled(bytes32 indexed escrowId, uint256 timestamp);
 
-    // Event emitted when Chainlink Automation triggers the handler
-    event AttestationHandled(
-        bytes32 indexed escrowId,
-        uint256 timestamp
-    );
-
-    // Simple mapping to prevent re-handling attestations (optional but good practice)
     mapping(bytes32 => bool) public isAttestationHandled;
 
     constructor(address _chainlinkFunctionsOracle, address _chainlinkAutomationRegistry) {
@@ -162,245 +177,167 @@ contract SettlementRamp {
         chainlinkAutomationRegistry = _chainlinkAutomationRegistry;
     }
 
-    // --- Core Attestation Function ---
-    // Called ONLY by the authorized Chainlink Functions Oracle upon verified attestation
     function attestPayment(string calldata attestationJson) external {
-        require(msg.sender == chainlinkFunctionsOracle, "Caller is not the authorized Functions oracle");
-
-        // --- Data Extraction (Requires robust parsing in production) ---
-        // For MVP, simulate extraction or assume fixed format passed by Function
-        bytes32 escrowId = bytes32(keccak256(abi.encodePacked("simulated-id-", attestationJson))); // Placeholder ID
-        address merchant = address(0x123); // Placeholder merchant
-        uint256 amount = 10000; // Placeholder amount
-        uint256 timestamp = block.timestamp; // Use block timestamp
-        string memory transactionId = "simulated_tx_id"; // Placeholder
-        // --- End Data Extraction ---
-
-        // Emit the event to signal successful attestation
-        emit PaymentAttested(
-            escrowId,
-            merchant,
-            amount,
-            timestamp,
-            transactionId
-        );
-        // Note: The isAttestationHandled flag is NOT set here, only when Automation acts.
+        require(msg.sender == chainlinkFunctionsOracle, "Not Functions Oracle");
+        // Minimal data extraction/parsing for MVP
+        bytes32 escrowId = keccak256(abi.encodePacked(attestationJson)); // Simple ID for MVP
+        // Emit event with minimal/placeholder data
+        emit PaymentAttested(escrowId, address(0), 0, block.timestamp, "sim_ref");
     }
 
-    // --- Automation Triggered Handler ---
-    // This function is called ONLY by the Chainlink Automation Registry
-    // It is triggered automatically when a PaymentAttested event is detected by an Upkeep
     function handleAttestationEvent(bytes32 _escrowId) external {
-        // Ensure caller is the authorized Automation Registry
-        require(msg.sender == chainlinkAutomationRegistry, "Caller is not the authorized Automation Registry");
-
-        // Prevent re-entrancy or handling the same event multiple times
-        require(!isAttestationHandled[_escrowId], "Attestation already handled");
+        require(msg.sender == chainlinkAutomationRegistry, "Not Automation Registry");
+        require(!isAttestationHandled[_escrowId], "Handled");
         isAttestationHandled[_escrowId] = true;
-
-        // --- Execute Downstream Automated Logic Here ---
-        // Examples:
-        // - Trigger USDC transfer from an escrow contract
-        // - Update a merchant's on-chain balance
-        // - Call another contract's function
-        // --- End Automated Logic ---
-
-        // For this MVP, we just emit an event to confirm handling
+        // Minimal action: emit event
         emit AttestationHandled(_escrowId, block.timestamp);
     }
-
-    // Consider adding functions for owner to update oracle/registry addresses if needed,
-    // protected by appropriate access control (e.g., Ownable pattern).
 }
 ```
 
-_Note: Smart contract code includes simulated data extraction for MVP
-simplicity. Production code requires robust data parsing (e.g., using a library
-or ensuring Functions passes structured data) and appropriate access controls._
+### 4. Chainlink Automation Upkeep Configuration (Base Sepolia)
 
-### 4. Chainlink Automation Upkeep Configuration
+- **Trigger:** Event `PaymentAttested(bytes32,address,uint256,uint256,string)`
+- **Target:** `SettlementRamp` contract address on Base Sepolia.
+- **Action:** Call `handleAttestationEvent(bytes32)`, mapping `escrowId` from
+  event.
 
-An Upkeep registered via the Chainlink Automation App for Base:
+### 5. Minimal UI & Middleware
 
-- **Trigger Type:** Event
-- **Contract Address:** Your deployed `Settlement Ramp` contract address.
-- **Event Signature:**
-  `PaymentAttested(bytes32, address, uint256, uint256, string)`
-- **Action:** Call the `handleAttestationEvent(bytes32)` function on the
-  `Settlement Ramp` contract.
-- **Input Mapping:** Configure the Upkeep to extract the `escrowId` (the first
-  indexed `bytes32` parameter) from the event log and pass it as the argument to
-  `handleAttestationEvent`.
+- **UI (React/Vite/Tailwind):**
+  - Built with modern, lightweight stack using **viem** for blockchain
+    interactions
+  - **Key UI Components:**
+    - `WalletConnection`: Uses wagmi + RainbowKit for seamless wallet connection
+    - `EventListener`: Uses viem's `watchContractEvent` to monitor
+      `AttestationHandled` events
+    - `TriggerButton`: Calls middleware endpoint to initiate the flow
+    - `StatusDisplay`: Shows current state of attestation flow
+
+  ```javascript
+  // Example: Event Listening with viem
+  import { createPublicClient, http, parseAbiItem } from "viem";
+  import { baseSepolia } from "viem/chains";
+
+  // Set up client for Base Sepolia
+  const client = createPublicClient({
+    chain: baseSepolia,
+    transport: http(),
+  });
+
+  // Listen for AttestationHandled events
+  const unwatch = client.watchContractEvent({
+    address: "YOUR_CONTRACT_ADDRESS",
+    event: parseAbiItem(
+      "event AttestationHandled(bytes32 indexed escrowId, uint256 timestamp)",
+    ),
+    onLogs: (logs) => {
+      console.log("Event detected!", logs);
+      // Update UI status
+    },
+  });
+  ```
+
+- **Middleware (Flask):**
+  - Single endpoint `/trigger-attestation` receives POST from UI, calls
+    ChainSettle Akash API (using env vars for secrets), returns HTTP 200.
 
 ## Getting Started
 
 ### Prerequisites
 
-- **ChainSettle Node:** Running instance on Akash with API endpoint, Plaid keys
-  (Sandbox), and Base wallet configured.
-- **Chainlink Functions Subscription:** Active subscription funded with LINK.
-- **Chainlink Automation Upkeep:** Registered Upkeep funded with LINK.
-- **Base Account:** Wallet with private key funded with ETH for contract
-  deployment and gas fees on Base Mainnet.
+- **ChainSettle Node:** Running instance on Akash with simulation logic, API
+  endpoint, and **Base Sepolia** wallet configured.
+- **Chainlink Functions Subscription:** Active subscription for **Base Sepolia**
+  funded with LINK.
+- **Chainlink Automation Upkeep:** Registered Upkeep for **Base Sepolia** funded
+  with LINK.
+- **Base Sepolia Account:** Wallet with private key funded with Base Sepolia
+  ETH.
 - **pnpm:** Node.js package manager (`npm install -g pnpm`).
 - **Foundry:** Smart contract toolkit
   (`curl -L https://foundry.paradigm.xyz | bash` then `foundryup`).
+- **Python 3 & uv:** For the Flask middleware. Install uv with
+  `curl -sSf https://astral.sh/uv/install.sh | bash`.
 
 ### Deployment Steps
 
-1. **Deploy ChainSettle Node to Akash:** Follow ChainSettle/Akash guides. Secure
-   the API endpoint and configure the Base wallet.
-2. **Deploy Settlement Ramp Contract to Base:**
+1. **Deploy ChainSettle Node to Akash:** Follow guides, implement simulation
+   trigger, secure API, configure Base Sepolia wallet. Note API URL & Auth
+   details.
+2. **Deploy Settlement Ramp Contract to Base Sepolia:**
    - Update deployment script (`scripts/DeploySettlementRamp.s.sol`) with
      correct Chainlink Functions Oracle and Automation Registry addresses for
-     Base Mainnet.
-   - Set `DEPLOYER_PRIVATE_KEY` and `BASE_RPC_URL` in `.env`.
+     **Base Sepolia**.
+   - Set `DEPLOYER_PRIVATE_KEY` and `BASE_SEPOLIA_RPC_URL` in `.env`.
    - Run:
-     `pnpm forge script scripts/DeploySettlementRamp.s.sol:DeployScript --rpc-url $BASE_RPC_URL --private-key $DEPLOYER_PRIVATE_KEY --broadcast --verify`
-   - Note the deployed contract address.
-3. **Configure & Deploy Chainlink Function:**
+     `pnpm forge script scripts/DeploySettlementRamp.s.sol:DeployScript --rpc-url $BASE_SEPOLIA_RPC_URL --private-key $DEPLOYER_PRIVATE_KEY --broadcast --verify --verifier basescan --verifier-url https://api-sepolia.basescan.org/api`
+   - Note the deployed contract address on Base Sepolia.
+3. **Configure & Deploy Chainlink Function (Base Sepolia):**
    - Set secrets (`CHAINSETTLE_API_URL`, `CHAINSETTLE_AUTH_TOKEN`,
      `CHAINSETTLE_PUBLIC_KEY`) in `.env`.
-   - Create secrets on Chainlink:
-     `npx @chainlink/functions-toolkit create-secrets .env --slotid 0 --ttl 1440`
-     (adjust TTL as needed).
-   - Deploy script:
-     `npx @chainlink/functions-toolkit deploy-function --script ./functions-script.js --subscriptionId YOUR_SUB_ID --gaslimit 300000`
-     (adjust gas limit).
-   - Add your Settlement Ramp contract address as an authorized consumer to your
-     Functions subscription via the Functions UI.
-4. **Register Chainlink Automation Upkeep:**
-   - Use the Chainlink Automation App
-     ([automation.chain.link](https://automation.chain.link/)).
-   - Register a new Upkeep for Base Mainnet.
-   - Select "Custom logic" trigger.
-   - Select "Event" as the trigger source.
-   - Enter the deployed Settlement Ramp contract address and the
-     `PaymentAttested` event signature.
-   - Configure the action to call `handleAttestationEvent(bytes32)` on the
-     contract, mapping the `escrowId` from the event data.
+   - Create secrets on Chainlink Functions UI for Base Sepolia.
+   - Deploy script using Chainlink toolkit, targeting **Base Sepolia**.
+   - Add your Base Sepolia contract address as an authorized consumer to your
+     Functions subscription.
+4. **Register Chainlink Automation Upkeep (Base Sepolia):**
+   - Use the Chainlink Automation App, selecting **Base Sepolia**.
+   - Register Upkeep (Custom logic -> Event trigger).
+   - Enter Base Sepolia contract address & `PaymentAttested` event signature.
+   - Configure action to call `handleAttestationEvent(bytes32)`, mapping
+     `escrowId`.
    - Fund the Upkeep with LINK.
+5. **Run Middleware & UI:**
+   - Configure middleware (`.env` with Akash API details).
+   - Install middleware dependencies:
+     `cd middleware && uv pip install -r requirements.txt`.
+   - Run Flask server: `python app.py`.
+   - Configure UI (`.env` with middleware URL, Base Sepolia contract address).
+     Run Vite dev server (`pnpm dev`).
 
-### Running the Automated Flow
+### Running the Automated Flow (Base Sepolia)
 
-1. Ensure all components are deployed, configured, and funded.
-2. Use the ChainSettle CLI (or equivalent trigger) to initiate an attestation
-   request for Base with a unique `escrowId`.
-   ```bash
-   # Example using ChainSettle CLI pointing to your Akash node
-   python cli.py attest --type plaid --escrow-id auto-settle-001 --amount 123.45 --network base
-   ```
-3. **Monitor:**
-   - ChainSettle node logs for verification success.
-   - Chainlink Functions UI for request execution and success/failure.
-   - Basescan for the incoming transaction to `attestPayment` from the Chainlink
-     Functions oracle.
-   - Basescan for the `PaymentAttested` event emitted by the contract.
-   - Chainlink Automation UI for the Upkeep performing based on the event.
-   - Basescan for the incoming transaction to `handleAttestationEvent` from the
-     Chainlink Automation registry.
-   - Basescan for the `AttestationHandled` event emitted by the contract.
+1. Ensure all components are deployed, configured, and funded on **Base
+   Sepolia**.
+2. Open the Minimal UI in your browser. Connect wallet (ensure network is Base
+   Sepolia).
+3. Click the "Simulate Payment & Attest" button.
+4. **Monitor:**
+   - UI status updates ("Requesting..." -> "Waiting..." -> "Handled!").
+   - Middleware logs confirming call to Akash.
+   - ChainSettle node logs (if accessible) confirming simulation & signing.
+   - Chainlink Functions UI for request execution on Base Sepolia.
+   - **Base Sepolia Scan** for the incoming transaction to `attestPayment`.
+   - **Base Sepolia Scan** for the `PaymentAttested` event.
+   - Chainlink Automation UI for the Upkeep performing on Base Sepolia.
+   - **Base Sepolia Scan** for the incoming transaction to
+     `handleAttestationEvent`.
+   - **Base Sepolia Scan** for the `AttestationHandled` event.
+   - UI displaying final "Attestation Handled!" status with link to the handling
+     transaction on Base Sepolia Scan.
 
-## Demo
+## Demo & Validation
 
-[Watch the demo video](https://youtu.be/demo-link) - _Link to be updated with
-the actual demo showcasing the full ChainSettle -> Functions -> Contract
-(PaymentAttested) -> Automation -> Contract (AttestationHandled) flow on Base._
+- **Proof:** Successful E2E execution demonstrated via **Base Sepolia Scan**
+  links for `attestPayment` tx, `PaymentAttested` event,
+  `handleAttestationEvent` tx, and `AttestationHandled` event.
+- **Video:** [Watch the 1-2 minute demo video](https://youtu.be/demo-link)
+  _(Placeholder)_
 
-## MVP Focus (Week 1)
+## Future Roadmap (Post-Hackathon)
 
-- **Core On-Ramp Protocol:** Implement automated trigger system as key
-  differentiator
-- **Essential Components:**
-  - ChainSettle Node with basic Plaid integration
-  - Simplified attestation signing
-  - Core Settlement Ramp Contract with basic event emission
-- **Key Differentiators:**
-  - Automated business logic execution
-  - Trust-minimized verification
-  - Programmable triggers
-
-## Future Roadmap
-
-### Phase 1: Enhanced On-Ramp (Post-MVP)
-
-- **Production-Ready Integrations:** Move beyond Plaid Sandbox to live Plaid,
-  Stripe webhooks, Yappy, etc.
-- **Robust Data Handling:** Implement proper JSON parsing in the contract or use
-  structured data encoding (e.g., ABI encoding) passed via Functions.
-- **USDC Settlement Logic:** Implement actual USDC transfer logic within
-  `handleAttestationEvent` or a called contract.
-- **Merchant Configuration:** Allow merchants to register and define target
-  addresses or actions for automation.
-- **Gas Abstraction:** Explore sponsoring Functions/Automation costs for
-  merchants.
-
-### Phase 2: Off-Ramp Foundation
-
-- **Mirror Architecture:** Adapt on-ramp components for off-ramp functionality
-- **Bank Network Integration:** Partner with financial institutions for fiat
-  payouts
-- **Compliance Framework:** Implement KYB/KYC and transaction monitoring
-- **Multi-Currency Support:** Enable local currency withdrawals
-
-### Phase 3: Full Integration
-
-- **Bi-directional Protocol:** Complete on/off ramp integration
-- **Advanced Automation:** Sophisticated trigger system for both directions
-- **Enhanced Security:** Multi-layer verification for all operations
-- **Global Coverage:** Support for multiple regions and currencies
-
-## Technical Architecture
-
-### MVP Architecture (Week 1)
-
-```mermaid
-sequenceDiagram
-    participant Plaid as Plaid API
-    participant ChainSettle as ChainSettle Node (Akash)
-    participant Base_Contract as Settlement Ramp Contract (Base)
-    participant CL_Automation as Chainlink Automation
-
-    Note over Plaid,Base_Contract: Simplified MVP Flow
-    Plaid->>ChainSettle: Payment notification
-    ChainSettle->>ChainSettle: Basic verification
-    ChainSettle->>Base_Contract: Submit attestation
-    Base_Contract->>Base_Contract: Emit event
-    CL_Automation->>Base_Contract: Trigger automation
-```
-
-### Future Architecture
-
-```mermaid
-sequenceDiagram
-    participant Plaid as Plaid API
-    participant ChainSettle as ChainSettle Node (Akash)
-    participant Base_Contract as Settlement Ramp Contract (Base)
-    participant CL_Automation as Chainlink Automation
-    participant Bank as Bank Network
-
-    Note over Plaid,Bank: Full On/Off Ramp Flow
-    Plaid->>ChainSettle: Payment notification
-    ChainSettle->>ChainSettle: Advanced verification
-    ChainSettle->>Base_Contract: Submit attestation
-    Base_Contract->>Base_Contract: Emit event
-    CL_Automation->>Base_Contract: Trigger automation
-    Base_Contract->>Bank: Future: Fiat payout
-```
+- **Real LATAM Integrations:** Replace simulation with live data sources
+  relevant to LATAM.
+- **Robust Data Handling:** Implement proper data parsing/encoding.
+- **USDC Settlement Logic:** Add actual stablecoin transfer capabilities.
+- **Merchant Configuration:** Allow user-defined parameters.
+- **Gas Abstraction:** Explore sponsoring costs.
 
 ## Acknowledgments
 
 - Directly leverages and adapts the
   **[ChainSettle](https://github.com/BrandynHamilton/chainsettle)** oracle
   system and its attestation framework, created by Brandyn Hamilton.
-- Utilizes **Akash Network** for decentralized, censorship-resistant hosting of
-  the ChainSettle oracle node.
-- Powered by **Chainlink Functions** for secure off-chain computation and
-  attestation proof verification.
-- Leverages **Chainlink Automation** for reliable, event-driven on-chain
-  triggering.
-- Built on **Base** for scalable and low-cost on-chain execution.
-
----
-
-Built for the Base Batches Buildathon
+- Utilizes **Akash Network** for decentralized hosting of the ChainSettle node.
+- Powered by **Chainlink Functions** & **Chainlink Automation**.
+- Built on **Base Sepolia** for this MVP.
