@@ -10,6 +10,7 @@ import { WagmiProvider } from "wagmi";
 
 import App from "./App.tsx";
 import { config } from "./wagmi.ts";
+import { ThemeProvider } from "./components/theme-provider";
 
 import "./index.css";
 
@@ -20,11 +21,13 @@ const rootElement = document.getElementById("root");
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-      <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      </WagmiProvider>
+      <ThemeProvider defaultTheme="dark" disableTransitionOnChange>
+        <WagmiProvider config={config}>
+          <QueryClientProvider client={queryClient}>
+            <App />
+          </QueryClientProvider>
+        </WagmiProvider>
+      </ThemeProvider>
     </React.StrictMode>
   );
 } else {
