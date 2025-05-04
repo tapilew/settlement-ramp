@@ -1,0 +1,17 @@
+{
+    "name": "middleware",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "bash scripts/dev.sh",
+        "build": "uv pip install -e .",
+        "clean": "rm -rf .venv __pycache__ *.egg-info",
+        "lint": "ruff check .",
+        "format": "ruff format .",
+        "test": "pytest"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "turbo": "latest"
+    }
+}

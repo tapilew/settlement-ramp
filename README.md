@@ -10,7 +10,7 @@ Payments**
 - [x] Use Turborepo
 - [x] Scaffold Wagmi UI
 - [x] Add shadcn/ui
-- [ ] Scaffold Python (Flask) uv project (for the middleware)
+- [x] Scaffold Python (Flask) uv project (for the middleware)
 - [ ] Scaffold Foundry project
 
 ## Core Focus: Automated On-Chain Reaction (Base Sepolia MVP)
