@@ -5,6 +5,13 @@ Payments**
 
 `<place-settlement-ramp-logo-here>`
 
+## To-dos
+
+- [x] Use Turborepo
+- [x] Scaffold Wagmi UI
+- [ ] Add shadcn/ui
+- [ ] Scaffold Python (Flask) uv project (for the middleware)
+
 ## Core Focus: Automated On-Chain Reaction (Base Sepolia MVP)
 
 Settlement Ramp is laser-focused on demonstrating the **automated triggering of
