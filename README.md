@@ -1,75 +1,80 @@
 # Settlement Ramp
 
 **Automated On-Chain Settlement on Base Sepolia Triggered by Verified PayPal
-Sandbox Payments**
+Payments**
 
-## The Problem: LATAM's Crippling On-Ramp Friction & The "PayPal Prison"
+![Settlement Ramp Logo](https://utfs.io/f/IN4OjmY4wMHBmEE0RbSvpu9Wa06GPs5MZzXBNcr4EFIHfTox)
+
+## The Problem: LATAM's Disconnected Financial Rails - The On-Ramp/Off-Ramp Nightmare
 
 For countless freelancers, small to medium-sized businesses (SMBs), and
-individuals across Latin America (LATAM), PayPal serves as a common gateway for
-receiving international USD payments. However, a significant problem emerges
-when they attempt to utilize these funds effectively:
+individuals across Latin America (LATAM), participating fully in the global
+digital economy is a constant struggle. While international platforms like
+**PayPal** are widely used to receive vital USD payments, users hit a wall when
+trying to access or utilize these funds efficiently:
 
-- **The "PayPal Prison":** While USD lands in their PayPal accounts, moving
-  these funds into local circulation or, critically, into on-chain stablecoins
-  like USDC on efficient blockchains such as Base, is often a nightmare.
-- **Exorbitant Fees:** Users can lose a substantial portion (e.g., 10-15% or
-  more) through multiple conversion steps, unfavorable exchange rates, and high
-  transaction fees from intermediary services.
-- **Crippling Delays:** Transfers can take days, not minutes, hindering cash
-  flow, business agility, and the ability to react to market opportunities.
-- **Opaque & Complex Processes:** Navigating the web of services required for
-  these conversions is confusing and time-consuming.
-- **Lack of Modern Infrastructure:** The absence of "Stripe-like" seamless
-  payment infrastructure in many LATAM countries exacerbates these issues,
-  leaving users with fragmented and inefficient options.
+- **The "PayPal Prison":** USD arrives in PayPal, but getting it into local
+  currency or, critically, into on-chain stablecoins like **USDC on Base**, is a
+  labyrinth of high fees (often 10-15%+), crippling multi-day delays, and
+  confusing processes.
+- **Blocked Access:** This friction prevents easy on-ramping into DeFi,
+  participation in global crypto commerce, and efficient treasury management for
+  businesses operating with stablecoins.
+- **Infrastructure Gaps:** Unlike regions with seamless options like Stripe,
+  LATAM lacks modern, developer-friendly infrastructure to bridge traditional
+  payment rails (especially international ones) with the on-chain world.
 
-This friction effectively traps funds and blocks LATAM users from fully
-participating in global digital commerce, accessing DeFi opportunities, or
-managing their treasuries efficiently with stablecoins on modern blockchains
-like Base.
+This isn't just inconvenient; it's a major barrier to economic empowerment,
+trapping value and hindering growth for a massive, digitally-savvy population.
 
-## Our Solution for this MVP: Settlement Ramp - A Verifiable Bridge from PayPal to Base Sepolia
+## The Vision: Equilibrio - Seamlessly Connecting LATAM Payments to the On-Chain World
 
-This MVP showcases **Settlement Ramp**, a system built to demonstrate a direct
-solution to automating the _next step_ after a PayPal payment is confirmed. We
-leverage the **ChainSettle oracle system (deployed on Akash)** to create a
-secure, automated bridge.
+This friction disappears with **Equilibrio**, a project that allows LATAM users
+to accept payments via their **local methods (Yappy, PSE, Nequi, etc.) OR
+international platforms like PayPal**, and see those funds **automatically
+reflected or converted to USDC on Base**, ready to plug into any app, DAO, or
+DeFi protocol instantly.
 
-Specifically, this project demonstrates how a **payment confirmation within the
-PayPal Sandbox environment** (simulating a LATAM user receiving an international
-USD payment) can verifiably trigger immediate, programmable actions on **Base
-Sepolia**.
+## Settlement Ramp: Building the Core Engine for Equilibrio (Base Sepolia)
 
-The core innovation is the **trust-minimized, automated pipeline** from an
-off-chain fiat rail confirmation (PayPal Sandbox) to an actionable on-chain
-event, with subsequent automated handling.
+To realize this vision, robust underlying infrastructure is essential. For this
+Base Batches project (Stablecoins Track), we are building and demonstrating
+**Settlement Ramp**, the **critical core engine** that makes such seamless
+integration possible.
 
-**Immediate Value & Foundational Infrastructure:**
+Settlement Ramp is the **secure, automated bridge** connecting verified
+off-chain payment confirmations to programmable actions on Base. Our
+implementation uses the **ChainSettle oracle system (deployed on Akash)** to
+attest to a **payment confirmation received directly within the PayPal Sandbox
+environment**, simulating a common international payment scenario for LATAM
+users and validating the trust-minimized, automated pipeline from an off-chain
+payment confirmation to an actionable on-chain event.
 
-For this hackathon, we prove the technical feasibility of this critical bridge.
-This infrastructure is a **foundational building block** for more comprehensive
-financial tools aimed at solving LATAM's payment fragmentation (aligning with
-the broader vision of systems like
-[Equilibrio](https://github.com/tapilew/equilibrio-alpha)). By automating the
-on-chain reaction to off-chain payments, we pave the way for solutions that can
-significantly reduce fees, eliminate delays, and bring transparency to
-on-ramping USD (via PayPal) to **USDC on Base** for LATAM users.
+**Why This Implementation is Crucial for Equilibrio & Fintechs:**
 
-## Technical Architecture: A Lean, Focused Bridge (Base Sepolia MVP)
+This Settlement Ramp implementation provides the **validated foundational
+layer** that Equilibrio and other fintechs and exchanges can build upon to
+offer:
 
-Our architecture for this MVP is streamlined to showcase the core E2E flow:
+- Automated USDC on-ramps from PayPal (and eventually other sources).
+- Significantly reduced friction and costs for LATAM users accessing the
+  on-chain economy.
+- Programmable financial workflows triggered directly by real-world payments on
+  Base.
+
+## Technical Architecture: A Lean, Focused Bridge (Base Sepolia)
+
+Our architecture is streamlined to showcase the core E2E flow, leveraging
+ChainSettle's capabilities:
 
 1. **ChainSettle Node (Akash - PayPal Sandbox Integration)**:
-   - The core off-chain component. It integrates directly with the **PayPal
-     Sandbox API** to monitor a configured recipient email address for payment
-     confirmations.
+   - Integrates directly with the **PayPal Sandbox API** to monitor a configured
+     recipient email address for payment confirmations.
    - Upon detecting a payment, ChainSettle verifies it and **generates a
      cryptographic attestation (a signed proof)** containing key payment
      details.
-   - Crucially, the ChainSettle node then **itself initiates an on-chain
-     transaction**, calling the `SettlementRamp` contract on Base Sepolia with
-     this signed proof.
+   - The ChainSettle node then **initiates an on-chain transaction**, calling
+     the `SettlementRamp` contract on Base Sepolia with this signed proof.
 2. **Settlement Ramp Contract (Base Sepolia)**:
    - A lean smart contract on Base Sepolia acting as the **on-chain verifier and
      event emitter.**
@@ -93,7 +98,8 @@ Our architecture for this MVP is streamlined to showcase the core E2E flow:
      by ChainSettle).
    - It then connects to Base Sepolia (via wagmi/viem) to listen for the final
      `AttestationHandled` event and display confirmation.
-   - The trigger is the PayPal Sandbox payment itself, detected by ChainSettle.
+   - **The trigger is the PayPal Sandbox payment itself, detected by
+     ChainSettle.** The UI serves to guide the user and observe the result.
 
 ```mermaid
 sequenceDiagram
@@ -104,7 +110,7 @@ sequenceDiagram
     participant UI as Minimal UI (React - Observes & Guides)
 
     Note over PayPal_Sandbox, ChainSettle: Off-Chain Payment & Detection
-    User->>PayPal_Sandbox: Makes payment to monitored email
+    User->>PayPal_Sandbox: Makes payment to monitored email (guided by UI)
     PayPal_Sandbox-->>ChainSettle: Payment notification detected
 
     Note over ChainSettle, Base_Contract: On-Chain Attestation by ChainSettle
@@ -121,7 +127,7 @@ sequenceDiagram
     UI->>UI: Update Status Display
 ```
 
-## Security Model: Focused on MVP Integrity
+## Security Model: Focused on Implementation Integrity
 
 1. **Attestation Origin (ChainSettle on Akash):** ChainSettle's integration with
    PayPal Sandbox and its private key for signing ensure the attestation
@@ -136,17 +142,17 @@ sequenceDiagram
 4. **Decentralized Event Reaction (Chainlink Automation):** Provides a reliable
    and tamper-resistant way to act upon the verified on-chain event.
 
-## Implementation Highlights (MVP for Base Sepolia)
+## Implementation Highlights (Base Sepolia)
 
 ### 1. ChainSettle Node (Akash) - PayPal Sandbox Integration & Tx Submission
 
 - Configured with PayPal Sandbox API credentials to monitor a specific recipient
   email.
 - Upon detecting a payment, it constructs a message with payment details (e.g.,
-  `escrowId`, amount, PayPal `txRef`), signs it using its private key, and then
-  uses a library (like `web3.py` or `ethers.js` within its Python/Node.js
-  environment) to send a raw transaction calling `attestPayment(signedProof)` on
-  the Base Sepolia contract.
+  `escrowId`, amount, PayPal `txRef`), signs it using its private key (EIP-191
+  standard recommended), and then uses a library (like `web3.py` or `viem`) to
+  send a raw transaction calling `attestPayment(...)` with all necessary
+  arguments (including the signature) on the Base Sepolia contract.
 
 ### 2. Settlement Ramp Contract (Base Sepolia) - Signature Verification
 
@@ -155,17 +161,13 @@ sequenceDiagram
 pragma solidity ^0.8.19;
 
 contract SettlementRamp {
-    address public immutable chainSettleNodeAddress; // Authorized attester
-    address public immutable chainlinkAutomationRegistry;
+    address public immutable chainSettleNodeAddress; // Authorized attester from Akash
+    address public immutable chainlinkAutomationRegistry; // Base Sepolia Automation Registry
 
     event PaymentAttested(bytes32 indexed escrowId, address indexed payerSim, uint256 amountSim, uint256 timestamp, string txRefPayPalSim);
     event AttestationHandled(bytes32 indexed escrowId, uint256 timestamp);
 
     mapping(bytes32 => bool) public isAttestationHandled;
-
-    // Store ChainSettle's public key (or derive from a known address if preferred)
-    // For simplicity, we assume chainSettleNodeAddress IS the signer.
-    // In a more complex setup, you might store a separate public key.
 
     constructor(address _chainSettleNodeAddress, address _chainlinkAutomationRegistry_baseSepolia) {
         chainSettleNodeAddress = _chainSettleNodeAddress; // Wallet address ChainSettle uses to send tx
@@ -182,51 +184,61 @@ contract SettlementRamp {
         _;
     }
 
-    // Called by ChainSettle node on Akash
+    // Called directly by the ChainSettle node on Akash
     function attestPayment(
         bytes32 _escrowId,         // Unique ID for the attestation
         address _payerSim,         // Simulated payer address from PayPal data
         uint256 _amountSim,        // Amount from PayPal data
         string calldata _txRefPayPalSim, // PayPal Transaction ID
-        bytes calldata _signature      // Signature from ChainSettle node
+        bytes calldata _signature      // Signature from ChainSettle node over hash of other params
     ) external onlyChainSettleNode {
+        // Reconstruct the message hash exactly as ChainSettle signed it
         bytes32 messageHash = keccak256(abi.encodePacked(_escrowId, _payerSim, _amountSim, _txRefPayPalSim));
-        // EIP-191 prefix: "\x19Ethereum Signed Message:\n" + message length
+        // Apply EIP-191 prefix: "\x19Ethereum Signed Message:\n" + message length (32 bytes for hash)
         bytes32 prefixedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
 
+        // Verify the signature against the hash and the known ChainSettle node address
         address signer = recoverSigner(prefixedHash, _signature);
         require(signer == chainSettleNodeAddress, "Invalid signature from ChainSettle");
 
+        // If signature is valid, emit the event
         emit PaymentAttested(_escrowId, _payerSim, _amountSim, block.timestamp, _txRefPayPalSim);
     }
 
+    // Called by Chainlink Automation on Base Sepolia
     function handleAttestationEvent(bytes32 _escrowId) external onlyAutomationRegistry {
         require(!isAttestationHandled[_escrowId], "Attestation already handled");
         isAttestationHandled[_escrowId] = true;
+        // Minimal action for MVP: emit event. Future: trigger USDC settlement.
         emit AttestationHandled(_escrowId, block.timestamp);
     }
 
+    // Helper function to recover signer address from signature
     function recoverSigner(bytes32 _hash, bytes calldata _signature)
         internal pure returns (address)
     {
         bytes32 r;
         bytes32 s;
         uint8 v;
+        // Check signature length (must be 65 bytes)
         if (_signature.length != 65) {
             return address(0);
         }
+        // Extract signature components (r, s, v)
         assembly {
             r := mload(add(_signature, 32))
             s := mload(add(_signature, 64))
-            v := byte(0, mload(add(_signature, 96)))
+            v := byte(0, mload(add(_signature, 96))) // Use 96 for v if r,s are 32 bytes each
         }
-        // EIP-2 still valid for v calculation
+        // Adjust v value for older Ledger signing standard if necessary (usually 27 or 28)
         if (v < 27) {
             v += 27;
         }
+        // Ensure v is either 27 or 28
         if (v != 27 && v != 28) {
             return address(0);
         }
+        // Use ecrecover precompile to recover the signer's address
         return ecrecover(_hash, v, r, s);
     }
 }
@@ -241,7 +253,8 @@ contract SettlementRamp {
 
 ### 4. Minimal UI (React/Vite/Tailwind)
 
-- Provides instructions to make a PayPal Sandbox payment.
+- Provides instructions: "1. Send payment via PayPal Sandbox to
+  `[monitored_email]`. 2. Wait for confirmation below."
 - Connects wallet (wagmi/RainbowKit for Base Sepolia).
 - Listens for `AttestationHandled` event using `viem watchContractEvent` on Base
   Sepolia.
@@ -249,7 +262,17 @@ contract SettlementRamp {
   on Base Sepolia, Awaiting Automation..." -> "Attestation Handled! Tx:
   [SepoliaScan link]".
 
-## Getting Started (for Base Sepolia MVP)
+## Technical Stack
+
+- **Smart Contracts**: Solidity, Foundry
+- **Frontend**: React, Vite, Tailwind CSS
+- **Web3 Integration**: wagmi (React hooks for Ethereum), viem (TypeScript
+  Ethereum library)
+- **Automation**: Chainlink Automation (Event-Based Trigger)
+- **Oracle**: ChainSettle (deployed on Akash)
+- **Testnet**: Base Sepolia
+
+## Getting Started (for Base Sepolia)
 
 ### Prerequisites
 
@@ -257,47 +280,75 @@ contract SettlementRamp {
   - Running instance configured with **PayPal Sandbox API credentials**.
   - Monitors a specific **PayPal Sandbox recipient email address**.
   - Wallet funded with **Base Sepolia ETH** to send `attestPayment`
-    transactions.
-- **PayPal Sandbox Account:** To send test payments.
+    transactions. Note this wallet's address (`chainSettleNodeAddress`).
+- **PayPal Sandbox Account:** To send test payments to the monitored email.
 - **Chainlink Automation Upkeep (Base Sepolia):** Registered and funded with
-  LINK.
+  LINK for event-based triggering.
 - **Base Sepolia Account:** Wallet with private key for deploying the contract.
-- **pnpm, Foundry, Python 3 & uv.**
+- **Development Tools:**
+  - pnpm (package manager)
+  - Foundry (for smart contract development)
+  - Node.js (for frontend development)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/tapilew/equilibrio-alpha.git
+   cd equilibrio-alpha
+   ```
+
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
 
 ### Deployment Steps (All for Base Sepolia)
 
 1. **Deploy & Configure ChainSettle Node to Akash:**
-   - Implement PayPal Sandbox monitoring and transaction submission logic.
-   - Ensure its wallet address (used to send txns) is known for the
-     `SettlementRamp` constructor.
+   - Implement PayPal Sandbox monitoring and transaction submission logic
+     (signing message, sending raw tx).
+   - Note the Base Sepolia wallet address the node uses
+     (`chainSettleNodeAddress`).
 2. **Deploy Settlement Ramp Contract to Base Sepolia:**
    - Update constructor arguments in deployment script
-     (`scripts/DeploySettlementRamp.s.sol`) with the **ChainSettle Node's Base
-     Sepolia address** and the correct **Chainlink Automation Registry address
-     for Base Sepolia**.
+     (`scripts/DeploySettlementRamp.s.sol`) with the `chainSettleNodeAddress`
+     and the correct **Chainlink Automation Registry address for Base Sepolia**.
    - Set `DEPLOYER_PRIVATE_KEY` and `BASE_SEPOLIA_RPC_URL` in `.env`.
    - Run:
-     `forge script scripts/DeploySettlementRamp.s.sol:DeployScript --rpc-url $BASE_SEPOLIA_RPC_URL --private-key $DEPLOYER_PRIVATE_KEY --broadcast --verify --verifier basescan --verifier-url https://api-sepolia.basescan.org/api`
+     ```bash
+     pnpm forge script scripts/DeploySettlementRamp.s.sol:DeployScript --rpc-url $BASE_SEPOLIA_RPC_URL --private-key $DEPLOYER_PRIVATE_KEY --broadcast --verify --verifier basescan --verifier-url https://api-sepolia.basescan.org/api
+     ```
    - Note deployed contract address.
 3. **Register Chainlink Automation Upkeep (Base Sepolia):**
-   - Use Chainlink Automation App for Base Sepolia.
-   - Configure Event trigger for `PaymentAttested` on your contract, calling
-     `handleAttestationEvent(bytes32)`.
+   - Use Chainlink Automation App for Base Sepolia
+   - Configure Event trigger for `PaymentAttested` on your contract
+   - Map the `escrowId` from the event to the `handleAttestationEvent` function
+     parameter
+   - Fund the upkeep with LINK tokens
 4. **Run UI:**
-   - Configure UI (`.env` with Base Sepolia contract address and RPC URL). Run
-     Vite dev server (`pnpm dev`).
+   - Configure UI (`.env` with Base Sepolia contract address and RPC URL)
+   - Start development server:
+     ```bash
+     pnpm dev
+     ```
 
 ### Running the Automated Flow (on Base Sepolia)
 
 1. **Make a PayPal Sandbox Payment:** Send payment to the email monitored by
-   ChainSettle. Include a unique reference if ChainSettle uses it to identify
-   the specific payment to attest.
+   ChainSettle. Note any reference ID.
 2. **Observe ChainSettle:** Node detects payment, verifies, signs, and sends
-   transaction to `attestPayment` on Base Sepolia.
+   transaction calling `attestPayment` on Base Sepolia.
 3. **Monitor Base Sepolia Scan & UI:**
    - Transaction from ChainSettle node calling `attestPayment`.
    - `PaymentAttested` event.
-   - Chainlink Automation Upkeep triggers.
+   - Chainlink Automation Upkeep triggers on event detection.
    - Transaction from Automation Registry calling `handleAttestationEvent`.
    - `AttestationHandled` event.
    - UI updates status to "Attestation Handled!" with transaction link.
@@ -306,30 +357,43 @@ contract SettlementRamp {
 
 - **Proof:** Successful E2E execution via **Base Sepolia Explorer**
   (`https://sepolia.base.org/`) links for all on-chain steps.
-- **Video:** A demo video showcasing the PayPal Sandbox payment to automated
-  Base Sepolia flow and UI update will be added here.
+- **Video:** [Watch the 1-2 minute demo video](https://example.com)
+  _(Placeholder - shows PayPal Sandbox payment -> automated Base Sepolia flow ->
+  UI update)_
 
-## Future Roadmap
+## Future Roadmap (Building Towards Equilibrio & Beyond)
 
-This MVP proves the core automated bridge from PayPal Sandbox to Base Sepolia.
-Future work:
+This Settlement Ramp implementation proves the core automated bridge from PayPal
+Sandbox to Base Sepolia. The future roadmap, building towards the full
+Equilibrio vision and solving the LATAM on-ramp/off-ramp challenge, includes:
 
-- **Live PayPal Integration:** Transition to live PayPal APIs.
-- **Direct USDC Settlement Logic:** Implement actual USDC transfers on Base
-  (mainnet) triggered by `handleAttestationEvent`.
-- **Broader LATAM Payment Rails:** Explore secure integrations with other
-  relevant LATAM payment methods.
+- **Live PayPal & Broader API Integration:** Transition ChainSettle to use live
+  PayPal APIs and integrate with APIs for **actual LATAM local payment methods
+  (Yappy, PSE, Nequi, etc.)** as they become accessible or explore alternative
+  verification methods.
+- **Direct USDC Conversion & Settlement:** Implement logic within
+  `handleAttestationEvent` (or a subsequent contract called by it) to perform
+  **automated conversion/transfer of USDC** on Base (mainnet).
+- **Building for Fintechs & Exchanges:** Develop SDKs and clear integration
+  paths for other financial services to leverage this core bridging
+  infrastructure.
+- **Expanding Off-Ramp Capabilities:** Architecting the reverse flow (on-chain
+  event -> off-chain fiat payout attestation) for seamless off-ramping.
 - **Enhanced Data & Security:** Robust parsing of payment data, comprehensive
-  error handling.
-- **User/Merchant Tools:** Develop interfaces for easier configuration and use.
+  error handling, and production-grade security.
 
 ## Acknowledgments
 
-- This project heavily features and showcases the **ChainSettle oracle system**
-  ([link to GitHub](https://github.com/BrandynHamilton/chainsettle)) by Brandyn
-  Hamilton, deployed on **Akash Network**.
+- This project, **Settlement Ramp**, heavily features and showcases the
+  **ChainSettle oracle system**
+  ([GitHub](https://github.com/BrandynHamilton/chainsettle)) by Brandyn
+  Hamilton, deployed on **Akash Network**, as the core technology for off-chain
+  event attestation and on-chain transaction initiation.
 - Utilizes **Chainlink Automation** for reliable on-chain event triggering on
   **Base Sepolia**.
 - Built on **Base Sepolia** for the Base Batches Buildathon (Stablecoins Track).
 - Leverages **PayPal Sandbox** for realistic off-chain payment event
   demonstration.
+- Part of the broader **Equilibrio** ecosystem
+  ([GitHub](https://github.com/tapilew/equilibrio-alpha)) focused on building
+  composable financial infrastructure for LATAM.
