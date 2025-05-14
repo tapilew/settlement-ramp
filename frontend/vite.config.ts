@@ -1,11 +1,14 @@
 import path from "node:path";
-import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type PluginOption } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss() as unknown as PluginOption],
+  plugins: [react()],
+  css: {
+    postcss: path.resolve(__dirname, "postcss.config.js"),
+    devSourcemap: true,
+  },
   resolve: {
     alias: {
       buffer: "buffer",
@@ -29,6 +32,11 @@ export default defineConfig({
       output: {
         manualChunks: {},
       },
+    },
+  },
+  server: {
+    hmr: {
+      overlay: true,
     },
   },
 });

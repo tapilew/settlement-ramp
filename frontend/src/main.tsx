@@ -7,12 +7,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { WagmiProvider } from "wagmi";
+import { WalletProvider } from "@/components/wagmi-provider";
 
 import App from "./App.tsx";
 import { config } from "./wagmi.ts";
-import { ThemeProvider } from "./components/theme-provider";
 
 import "./index.css";
+// import "./test.css"; // Test CSS file - REMOVED
 
 const queryClient = new QueryClient();
 
@@ -21,13 +22,13 @@ const rootElement = document.getElementById("root");
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-      <ThemeProvider defaultTheme="dark" disableTransitionOnChange>
-        <WagmiProvider config={config}>
-          <QueryClientProvider client={queryClient}>
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <WalletProvider>
             <App />
-          </QueryClientProvider>
-        </WagmiProvider>
-      </ThemeProvider>
+          </WalletProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
     </React.StrictMode>
   );
 } else {
