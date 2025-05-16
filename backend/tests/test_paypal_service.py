@@ -69,4 +69,11 @@ def test_execute_payment(paypal_service):
         assert result["payment_id"] == "test_payment_id"
         assert result["status"] == "completed"
         assert result["amount"] == "100.00"
-        assert result["currency"] == "USD" 
+        assert result["currency"] == "USD"
+
+def test_verify_payment():
+    """
+    Test payment verification
+    """
+    # Test implementation
+    pass 

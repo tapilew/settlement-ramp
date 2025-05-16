@@ -26,31 +26,20 @@ class BlockchainService:
             abi=contract_abi
         )
 
-    def verify_payment_attestation(self, escrow_id: str, signature: str) -> bool:
+    def verify_payment_attestation(self, settlement_id: str) -> bool:
         """
-        Verifica una attestación de pago en el contrato
+        Verify a payment attestation in the contract
         """
-        try:
-            # En una implementación real, llamaríamos al contrato
-            # Por ahora, retornamos True para simular la verificación
-            return True
-        except Exception as e:
-            raise Exception(f"Error verifying payment attestation: {str(e)}")
+        # In a real implementation, we would call the contract
+        # For now, we return True to simulate verification
+        return True
 
-    def get_payment_status(self, escrow_id: str) -> dict:
+    def get_payment_details(self, settlement_id: str) -> dict:
         """
-        Obtiene el estado de un pago desde el contrato
+        Get payment details from the contract
         """
-        try:
-            # En una implementación real, consultaríamos el contrato
-            # Por ahora, retornamos un estado simulado
-            return {
-                "escrow_id": escrow_id,
-                "status": "pending",
-                "block_number": self.w3.eth.block_number
-            }
-        except Exception as e:
-            raise Exception(f"Error getting payment status: {str(e)}")
+        # In a real implementation, we would query the contract
+        return {}
 
     def is_connected(self) -> bool:
         """

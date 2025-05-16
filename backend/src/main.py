@@ -97,6 +97,17 @@ async def get_settlement_activity(
     )
     return result
 
+@app.post("/attest")
+async def attest_payment(settlement_id: str):
+    """
+    Start the attestation process for a settlement
+    """
+    try:
+        # Implementation here
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000) 

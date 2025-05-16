@@ -22,7 +22,7 @@ interface IChainSettleAttest {
 
 /**
  * @title SettlementRamp
- * @dev Contrato para manejar pagos verificados de PayPal y su asentamiento en la blockchain
+ * @dev Contract to handle verified PayPal payments and their settlement on the blockchain
  */
 contract SettlementRamp is Ownable, ReentrancyGuard, AutomationCompatibleInterface {
     // Eventos
@@ -104,7 +104,7 @@ contract SettlementRamp is Ownable, ReentrancyGuard, AutomationCompatibleInterfa
     ) external onlyAuthorizedAttester validAmount(amount) {
         require(payments[escrowId].payer == address(0), "Payment already attested");
         
-        // Verificar la attestación de ChainSettle
+        // Verify ChainSettle attestation
         require(chainSettleAttest.verifyAttestation(escrowId), "Invalid ChainSettle attestation");
         
         payments[escrowId] = Payment({
@@ -126,7 +126,7 @@ contract SettlementRamp is Ownable, ReentrancyGuard, AutomationCompatibleInterfa
         require(payments[escrowId].payer != address(0), "Payment not found");
         require(!isSettled[escrowId], "Payment already settled");
 
-        // Verificar que el pago ha sido finalizado en ChainSettle
+        // Verify that the payment has been finalized in ChainSettle
         (,,bool isFinalized) = settlementRegistry.getSettlement(escrowId);
         require(isFinalized, "Payment not finalized in ChainSettle");
 
@@ -186,7 +186,7 @@ contract SettlementRamp is Ownable, ReentrancyGuard, AutomationCompatibleInterfa
         
         require(_shouldCheckPayment(payment), "Payment not ready for check");
         
-        // Verificar si el pago ha sido finalizado en ChainSettle
+        // Verify that the payment has been finalized in ChainSettle
         (,,bool isFinalized) = settlementRegistry.getSettlement(escrowId);
         
         if (isFinalized) {
@@ -204,7 +204,7 @@ contract SettlementRamp is Ownable, ReentrancyGuard, AutomationCompatibleInterfa
      * @dev Función interna para obtener pagos pendientes
      */
     function _getPendingPayments() internal view returns (bytes32[] memory) {
-        // Implementación simplificada - en producción, usar un array dinámico
+        // Simplified implementation - in production, use a dynamic array
         bytes32[] memory pending = new bytes32[](100);
         uint256 count = 0;
         

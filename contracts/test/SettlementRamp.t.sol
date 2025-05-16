@@ -78,10 +78,10 @@ contract SettlementRampTest {
         uint256 amount = 2 ether;
         string memory paypalTxId = "PAY-123456";
 
-        // Configurar el mock para que la attestación sea válida
+        // Configure mock for valid attestation
         mockAttest.setValidAttestation(escrowId, true);
 
-        // Llamar a attestPayment desde el attester
+        // Call attestPayment from attester
         settlementRamp.attestPayment(escrowId, payer, amount, paypalTxId);
 
         (
@@ -103,10 +103,10 @@ contract SettlementRampTest {
         uint256 amount = 2 ether;
         string memory paypalTxId = "PAY-123456";
 
-        // Configurar el mock para que la attestación sea inválida
+        // Configure mock for invalid attestation
         mockAttest.setValidAttestation(escrowId, false);
 
-        // Intentar attestar el pago
+        // Try to attest payment
         bool success = true;
         try settlementRamp.attestPayment(escrowId, payer, amount, paypalTxId) {
             success = true;
