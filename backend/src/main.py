@@ -1,9 +1,10 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict
 import os
 from dotenv import load_dotenv
+from .services.chainsettle import ChainSettleService
+from datetime import datetime
 
 # Cargar variables de entorno
 load_dotenv()
@@ -23,47 +24,78 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Modelos Pydantic
-class PaymentRequest(BaseModel):
-    amount: float
-    recipient_email: str
-    escrow_id: str
-    payer_address: str
-
-class PaymentResponse(BaseModel):
-    payment_id: str
-    status: str
-    paypal_url: Optional[str] = None
-
 # Rutas
 @app.get("/")
 async def root():
     return {"message": "Bienvenido a Settlement Ramp API"}
 
-@app.post("/payments/initiate", response_model=PaymentResponse)
-async def initiate_payment(payment: PaymentRequest):
-    try:
-        # Aquí irá la lógica para iniciar el pago con PayPal
-        # Por ahora, retornamos una respuesta simulada
-        return PaymentResponse(
-            payment_id="test_payment_123",
-            status="pending",
-            paypal_url="https://sandbox.paypal.com/test_payment"
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.post("/api/settlements/register")
+async def register_settlement(
+    settlement_id: str,
+    network: str,
+    settlement_type: str,
+    amount: float,
+    recipient_email: str,
+    metadata: Optional[Dict] = None,
+    notify_email: Optional[str] = None
+):
+    """
+    Registra un nuevo settlement en ChainSettle.
+    """
+    chainsettle = ChainSettleService()
+    result = chainsettle.register_settlement(
+        settlement_id=settlement_id,
+        network=network,
+        settlement_type=settlement_type,
+        amount=amount,
+        recipient_email=recipient_email,
+        metadata=metadata,
+        notify_email=notify_email
+    )
+    return result
 
-@app.get("/payments/{payment_id}/status")
-async def get_payment_status(payment_id: str):
-    try:
-        # Aquí irá la lógica para verificar el estado del pago
-        return {
-            "payment_id": payment_id,
-            "status": "pending",
-            "details": "Payment is being processed"
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.post("/api/settlements/{settlement_id}/attest")
+async def attest_settlement(
+    settlement_id: str,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None
+):
+    """
+    Inicia el proceso de attestación para un settlement.
+    """
+    chainsettle = ChainSettleService()
+    result = chainsettle.initiate_attestation(
+        settlement_id=settlement_id,
+        start_date=start_date,
+        end_date=end_date
+    )
+    return result
+
+@app.get("/api/settlements/{settlement_id}/status")
+async def get_settlement_status(settlement_id: str):
+    """
+    Obtiene el estado actual de un settlement.
+    """
+    chainsettle = ChainSettleService()
+    result = chainsettle.get_settlement_status(settlement_id)
+    return result
+
+@app.get("/api/settlements/{settlement_id}/activity")
+async def get_settlement_activity(
+    settlement_id: str,
+    interval: int = 30,
+    max_attempts: int = 20
+):
+    """
+    Monitorea la actividad de un settlement.
+    """
+    chainsettle = ChainSettleService()
+    result = chainsettle.poll_settlement_activity(
+        settlement_id=settlement_id,
+        interval=interval,
+        max_attempts=max_attempts
+    )
+    return result
 
 if __name__ == "__main__":
     import uvicorn

@@ -137,3 +137,10 @@ dist
 
 # Turborepo
 .turbo
+
+# External dependencies and submodules
+lib/
+contracts/lib/
+**/forge-std/
+**/openzeppelin-contracts/
+**/chainlink-brownie-contracts/

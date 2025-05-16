@@ -1,0 +1,15 @@
+[profile.default]
+# Directorio donde se almacenarán las dependencias
+libs = ["lib"]
+
+# Configuración de dependencias
+[dependencies]
+forge-std = { git = "https://github.com/foundry-rs/forge-std", tag = "v1.7.1" }
+openzeppelin-contracts = { git = "https://github.com/OpenZeppelin/openzeppelin-contracts", tag = "v4.9.3" }
+chainlink-brownie-contracts = { git = "https://github.com/smartcontractkit/chainlink-brownie-contracts", tag = "v0.8.0" }
+
+# Configuración de remappings
+[remappings]
+"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"
+"@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/"
+"forge-std/=lib/forge-std/src/" 
