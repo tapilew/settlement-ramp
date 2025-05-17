@@ -393,3 +393,137 @@ MIT License
 ## Contact
 
 For questions and support, please open an issue in the repository.
+
+## Smart Contract: SettlementRamp
+
+### Overview
+The SettlementRamp smart contract is a decentralized solution for handling verified PayPal payments and their settlement on the blockchain. It provides a secure and automated way to manage payment attestations and settlements through ChainSettle integration.
+
+### Contract Address
+```
+SettlementRamp: 0xdA7248aD6DB23139605Ef5F8De0C6d9C9c8313Ae
+Network: Base Sepolia
+```
+
+### Key Features
+
+#### 1. Payment Management
+- **Payment Attestation**: Records verified PayPal payments through ChainSettle
+- **Payment Settlement**: Marks payments as settled after verification
+- **Payment Limits**: Configurable minimum and maximum payment amounts
+- **Payment Tracking**: Maintains detailed records of all payments
+
+#### 2. Security Features
+- **Ownership Control**: Implements OpenZeppelin's Ownable for administrative control
+- **Reentrancy Protection**: Uses ReentrancyGuard to prevent reentrancy attacks
+- **Authorized Attesters**: Only authorized addresses can attest payments
+- **Amount Validation**: Ensures payments are within configured limits
+
+#### 3. Automation Integration
+- **Chainlink Automation**: Implements AutomationCompatibleInterface for automated checks
+- **Periodic Verification**: Automatically verifies payment status
+- **Settlement Tracking**: Monitors payment finalization in ChainSettle
+
+### Contract Structure
+
+#### State Variables
+```solidity
+mapping(bytes32 => Payment) public payments;
+mapping(bytes32 => bool) public isSettled;
+mapping(address => bool) public authorizedAttesters;
+uint256 public minPaymentAmount;
+uint256 public maxPaymentAmount;
+```
+
+#### Key Functions
+1. **attestPayment**
+   - Records a new payment attestation
+   - Verifies ChainSettle attestation
+   - Emits PaymentAttested event
+
+2. **settlePayment**
+   - Marks a payment as settled
+   - Verifies ChainSettle finalization
+   - Emits PaymentSettled event
+
+3. **getPaymentDetails**
+   - Returns detailed information about a payment
+   - Includes payer, amount, settlement status, and timestamps
+
+4. **checkUpkeep/performUpkeep**
+   - Chainlink Automation functions
+   - Monitors and processes pending payments
+
+### Deployment Details
+
+#### Network Information
+- **Network**: Base Sepolia
+- **Transaction Hash**: 0xf8ca6f0b94312b80842ec70566b695cf9211b0edde92241fa029836b3a7fa714
+- **Block Number**: 25846447
+- **Gas Used**: 2,403,694
+- **Gas Price**: 0.000985844 gwei
+- **Total Cost**: 0.000002369667307736 ETH
+
+#### Constructor Parameters
+```solidity
+minPaymentAmount: 0.01 ETH
+maxPaymentAmount: 10 ETH
+settlementRegistry: [ChainSettle Registry Address]
+chainSettleAttest: [ChainSettle Attest Address]
+chainSettleAttestNode: [ChainSettle Node Address]
+```
+
+### Integration Points
+
+#### 1. ChainSettle Integration
+- Settlement Registry for payment verification
+- Attestation system for payment validation
+- Node communication for status updates
+
+#### 2. Chainlink Automation
+- Automated payment verification
+- Periodic status checks
+- Settlement processing
+
+### Security Considerations
+
+#### Access Control
+- Only authorized attesters can record payments
+- Owner can manage authorized attesters
+- Payment limits prevent large-scale attacks
+
+#### Data Integrity
+- Payment records are immutable
+- Settlement status is verified through ChainSettle
+- Reentrancy protection ensures secure execution
+
+### Usage Guidelines
+
+#### For Payment Attestation
+1. Ensure payment is within configured limits
+2. Verify ChainSettle attestation
+3. Call attestPayment with required parameters
+
+#### For Payment Settlement
+1. Verify payment exists and is not settled
+2. Ensure ChainSettle finalization
+3. Call settlePayment with escrow ID
+
+#### For Payment Verification
+1. Use getPaymentDetails to check status
+2. Monitor PaymentSettled events
+3. Track automation triggers
+
+### Future Improvements
+1. Dynamic payment limits
+2. Enhanced automation rules
+3. Additional payment verification methods
+4. Gas optimization
+5. Extended event logging
+
+### Monitoring and Maintenance
+1. Regular balance checks
+2. Automation status monitoring
+3. Event log analysis
+4. Gas usage optimization
+5. Security updates
