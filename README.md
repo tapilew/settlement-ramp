@@ -258,3 +258,292 @@ The broader Equilibrio vision includes:
 - **Equilibrio ecosystem**
   ([GitHub](https://github.com/tapilew/equilibrio-alpha)) for LATAM financial
   infrastructure
+
+## Detailed Documentation
+
+### Executive Summary
+Settlement Ramp is an enterprise-grade blockchain solution that bridges traditional payment systems (PayPal) with blockchain settlements. This system provides a secure, automated, and transparent way to verify and settle payments using smart contracts and a robust backend infrastructure.
+
+### System Architecture
+
+#### High-Level Architecture
+```mermaid
+graph TD
+    A[Client Application] -->|Payment Initiation| B[PayPal API]
+    B -->|Payment Verification| C[Backend Service]
+    C -->|Settlement Registration| D[ChainSettle Oracle]
+    D -->|Attestation| E[Smart Contract]
+    E -->|Settlement| F[Base Sepolia Network]
+    
+    subgraph "Off-Chain Components"
+        B
+        C
+    end
+    
+    subgraph "On-Chain Components"
+        D
+        E
+        F
+    end
+```
+
+### Smart Contract: SettlementRamp
+
+#### Contract Details
+```
+Contract: SettlementRamp
+Address: 0xdA7248aD6DB23139605Ef5F8De0C6d9C9c8313Ae
+Network: Base Sepolia
+Transaction Hash: 0xf8ca6f0b94312b80842ec70566b695cf9211b0edde92241fa029836b3a7fa714
+Block Number: 25846447
+```
+
+#### Technical Specifications
+
+##### State Variables
+```solidity
+// Payment tracking
+mapping(bytes32 => Payment) public payments;
+mapping(bytes32 => bool) public isSettled;
+
+// Access control
+mapping(address => bool) public authorizedAttesters;
+
+// Payment limits
+uint256 public minPaymentAmount;
+uint256 public maxPaymentAmount;
+
+// Constants
+uint256 public constant MAX_CHECK_COUNT = 10;
+uint256 public constant CHECK_INTERVAL = 1 hours;
+```
+
+##### Key Functions
+
+1. **Payment Attestation**
+```solidity
+function attestPayment(
+    bytes32 escrowId,
+    address payer,
+    uint256 amount,
+    string calldata paypalTxId
+) external onlyAuthorizedAttester validAmount(amount)
+```
+
+2. **Payment Settlement**
+```solidity
+function settlePayment(bytes32 escrowId) 
+    external 
+    onlyAuthorizedAttester 
+    nonReentrant
+```
+
+3. **Payment Verification**
+```solidity
+function getPaymentDetails(bytes32 escrowId) 
+    external 
+    view 
+    returns (
+        address payer,
+        uint256 amount,
+        bool settled,
+        string memory paypalTxId,
+        uint256 lastCheckTimestamp,
+        uint256 checkCount
+    )
+```
+
+### Security Features
+
+#### Access Control
+- OpenZeppelin's Ownable implementation
+- Authorized attester management
+- Role-based access control
+- Secure function modifiers
+
+#### Reentrancy Protection
+- OpenZeppelin's ReentrancyGuard
+- Secure payment processing
+- Protected state modifications
+- Atomic operations
+
+#### Payment Validation
+- Amount range checks
+- Attestation verification
+- Settlement confirmation
+- Transaction integrity
+
+### Automation Integration
+
+#### Chainlink Automation
+```solidity
+function checkUpkeep(bytes calldata) 
+    external 
+    view 
+    returns (bool upkeepNeeded, bytes memory)
+
+function performUpkeep(bytes calldata) 
+    external
+```
+
+### Deployment Details
+
+#### Deployment Transaction Analysis
+```json
+{
+    "network": "Base Sepolia",
+    "contract_address": "0xdA7248aD6DB23139605Ef5F8De0C6d9C9c8313Ae",
+    "transaction_hash": "0xf8ca6f0b94312b80842ec70566b695cf9211b0edde92241fa029836b3a7fa714",
+    "block_number": 25846447,
+    "gas_used": 2403694,
+    "gas_price": "0.000985844 gwei",
+    "total_cost": "0.000002369667307736 ETH"
+}
+```
+
+#### Transaction Analysis Charts
+
+##### Gas Usage Distribution
+```mermaid
+pie title Gas Usage Distribution
+    "Contract Creation" : 1800000
+    "Constructor Execution" : 400000
+    "Storage Operations" : 150000
+    "Event Emissions" : 53000
+    "Other Operations" : 3694
+```
+
+##### Cost Breakdown
+```mermaid
+pie title Cost Breakdown (ETH)
+    "Gas Cost" : 0.000002369
+    "Network Fee" : 0.000000000667307736
+```
+
+##### Transaction Timeline
+```mermaid
+gantt
+    title Transaction Timeline
+    dateFormat  X
+    axisFormat %s
+    
+    section Transaction
+    Contract Creation    :0, 1800000
+    Constructor Execution :1800000, 2200000
+    Storage Operations   :2200000, 2350000
+    Event Emissions      :2350000, 2403694
+```
+
+##### Network Statistics
+```mermaid
+graph TD
+    A[Base Sepolia Network] -->|Block Height| B[25846447]
+    A -->|Gas Price| C[0.000985844 gwei]
+    A -->|Gas Used| D[2,403,694]
+    A -->|Total Cost| E[0.000002369667307736 ETH]
+    A -->|Status| F[Success]
+```
+
+### Post-Deployment Considerations
+
+#### Monitoring Requirements
+```mermaid
+graph TD
+    A[Contract Events] -->|Monitor| B[Payment Attestations]
+    A -->|Monitor| C[Payment Settlements]
+    A -->|Monitor| D[Automation Triggers]
+    B -->|Alert| E[Admin Dashboard]
+    C -->|Alert| E
+    D -->|Alert| E
+```
+
+#### Maintenance Procedures
+- Regular balance checks
+- Gas optimization
+- Security updates
+- Performance monitoring
+
+#### Emergency Procedures
+- Pause mechanism
+- Emergency withdrawal
+- Admin controls
+- Backup systems
+
+### Future Improvements
+
+#### Technical Roadmap
+- Dynamic payment limits
+- Enhanced automation
+- Multi-currency support
+- Cross-chain capabilities
+
+#### Feature Development
+- User dashboard
+- Analytics integration
+- Mobile application
+- API enhancements
+
+### Integration Points
+
+#### 1. ChainSettle Integration
+- Settlement Registry Interface
+- Attestation System
+- Node Communication
+- Status Updates
+
+#### 2. PayPal Integration
+- Payment Verification
+- Transaction Tracking
+- Status Updates
+- Error Handling
+
+### Usage Guidelines
+
+#### Payment Attestation Process
+1. Verify payment amount is within limits
+2. Check ChainSettle attestation
+3. Call attestPayment with parameters
+4. Monitor PaymentAttested event
+
+#### Settlement Process
+1. Verify payment exists
+2. Check ChainSettle finalization
+3. Call settlePayment
+4. Monitor PaymentSettled event
+
+#### Monitoring and Maintenance
+1. Regular balance checks
+2. Automation status monitoring
+3. Event log analysis
+4. Gas usage optimization
+5. Security updates
+
+### Security Considerations
+
+#### Access Control
+- Role-based permissions
+- Multi-signature support
+- Time-locked operations
+- Emergency procedures
+
+#### Data Integrity
+- Immutable records
+- Verified attestations
+- Secure settlements
+- Audit trails
+
+### Monitoring and Maintenance
+
+#### Regular Checks
+1. Contract balance
+2. Automation status
+3. Event logs
+4. Gas usage
+5. Security updates
+
+#### Maintenance Procedures
+1. Regular updates
+2. Security patches
+3. Performance optimization
+4. Documentation updates
+5. User support
